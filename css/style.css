@@ -1,0 +1,572 @@
+/* ============================================
+   REALLANEX — Islamic PWA Stylesheet
+   Author: Khalid (reallanex)
+   ============================================ */
+
+:root {
+  --green-dark: #0b3d2e;
+  --green-mid: #145c43;
+  --green-light: #1e7a5a;
+  --gold: #d4af37;
+  --gold-soft: #e8c96a;
+  --cream: #faf8f2;
+  --cream-2: #f1ede1;
+  --text: #1a1a1a;
+  --text-soft: #5a5a5a;
+  --card-bg: rgba(255,255,255,0.85);
+  --shadow: 0 8px 32px rgba(11,61,46,0.12);
+  --radius: 18px;
+  --transition: 0.35s cubic-bezier(.4,0,.2,1);
+  --arabic-font: 'Amiri Quran', serif;
+  --body-font: 'Poppins', sans-serif;
+}
+
+[data-theme="dark"] {
+  --green-dark: #071f17;
+  --green-mid: #0b3d2e;
+  --green-light: #145c43;
+  --cream: #0e1512;
+  --cream-2: #131c18;
+  --text: #eef4f0;
+  --text-soft: #a8bdb3;
+  --card-bg: rgba(19,28,24,0.85);
+  --shadow: 0 8px 32px rgba(0,0,0,0.45);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: var(--body-font);
+  background: var(--cream);
+  color: var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  transition: background var(--transition), color var(--transition);
+  padding-bottom: 80px;
+}
+
+/* --- Animated background canvas --- */
+#bg-canvas {
+  position:fixed; inset:0; z-index:-2; opacity:.55;
+  pointer-events:none;
+}
+
+/* --- Splash --- */
+.splash {
+  position:fixed; inset:0; z-index:9999;
+  background: linear-gradient(160deg, var(--green-dark), var(--green-mid));
+  display:flex; align-items:center; justify-content:center;
+  transition: opacity .8s ease, visibility .8s;
+}
+.splash.hide { opacity:0; visibility:hidden; }
+.splash-inner { text-align:center; animation: fadeUp 1s ease both; }
+.crescent {
+  width:80px; height:80px; border-radius:50%;
+  box-shadow: 22px 0 0 0 var(--gold);
+  margin:0 auto 24px;
+  animation: crescentGlow 2.5s ease-in-out infinite;
+}
+.splash-title {
+  font-size:2.6rem; color:#fff; letter-spacing:2px;
+  font-weight:700;
+}
+.splash-sub {
+  font-family: var(--arabic-font); color: var(--gold-soft);
+  font-size:1.4rem; margin-top:12px;
+}
+
+/* --- Topbar --- */
+.topbar {
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px;
+  background: rgba(11,61,46,0.92);
+  backdrop-filter: blur(14px);
+  color:#fff;
+}
+.brand { display:flex; align-items:center; gap:8px; font-weight:700; font-size:1.15rem; }
+.brand-icon { color: var(--gold); font-size:1.4rem; animation: spinSlow 18s linear infinite; }
+.hijri-date { font-size:.78rem; opacity:.85; letter-spacing:.5px; }
+.theme-toggle {
+  background: rgba(255,255,255,.12); border:none; color:#fff;
+  width:38px; height:38px; border-radius:50%; font-size:1.1rem;
+  cursor:pointer; transition: transform var(--transition), background var(--transition);
+}
+.theme-toggle:hover { transform: rotate(25deg) scale(1.1); background: rgba(255,255,255,.22); }
+
+/* --- Tabbar --- */
+.tabbar {
+  position:sticky; top:64px; z-index:40;
+  display:flex; justify-content:space-around;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(212,175,55,.18);
+  padding:6px 0;
+}
+.tab {
+  flex:1; background:none; border:none; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  font-size:1.1rem; padding:8px 0; color: var(--text-soft);
+  font-family: var(--body-font); font-weight:500;
+  transition: color var(--transition), transform var(--transition);
+  position:relative;
+}
+.tab span { font-size:.65rem; letter-spacing:.4px; }
+.tab.active { color: var(--green-light); transform: translateY(-2px); }
+.tab.active::after {
+  content:''; position:absolute; bottom:2px; width:22px; height:3px;
+  border-radius:3px; background: var(--gold);
+}
+
+/* --- Views --- */
+.view { display:none; padding:20px; max-width:780px; margin:0 auto; animation: fadeUp .5s ease both; }
+.view.active { display:block; }
+
+.section-title { font-size:1.4rem; margin-bottom:6px; color: var(--green-mid); }
+.section-sub { font-size:.85rem; color: var(--text-soft); margin-bottom:16px; }
+.sub-title { font-size:1rem; margin:22px 0 10px; color: var(--green-mid); }
+
+/* --- Hero --- */
+.hero { text-align:center; padding:26px 10px 18px; position:relative; }
+.hero-glow {
+  position:absolute; top:-40px; left:50%; transform:translateX(-50%);
+  width:200px; height:200px; border-radius:50%;
+  background: radial-gradient(circle, rgba(212,175,55,.25), transparent 70%);
+  filter: blur(20px); z-index:-1; animation: pulseGlow 4s ease-in-out infinite;
+}
+.hero-greeting { font-size:1.5rem; color: var(--green-mid); margin-bottom:6px; }
+.hero-sub { color: var(--text-soft); font-size:.9rem; }
+
+/* --- Cards --- */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding:20px;
+  box-shadow: var(--shadow);
+  margin:16px 0;
+  border: 1px solid rgba(212,175,55,.18);
+  backdrop-filter: blur(10px);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(11,61,46,.18); }
+
+.motivation-card h3 { font-size:1rem; color: var(--green-mid); margin-bottom:12px; }
+.arabic {
+  font-family: var(--arabic-font);
+  font-size:1.5rem; line-height:2; text-align:right;
+  color: var(--green-dark); margin:10px 0; direction:rtl;
+}
+[data-theme="dark"] .arabic { color: var(--gold-soft); }
+.translation { font-size:.92rem; line-height:1.6; color: var(--text); margin-bottom:8px; }
+.reference { font-size:.78rem; color: var(--gold); font-weight:600; }
+
+/* --- Buttons --- */
+.btn-ghost {
+  background: rgba(20,92,67,.08);
+  border: 1px solid rgba(20,92,67,.25);
+  color: var(--green-mid);
+  padding:8px 16px; border-radius:50px; font-size:.8rem;
+  cursor:pointer; font-family: var(--body-font); font-weight:500;
+  transition: all var(--transition);
+  margin-top:10px;
+}
+.btn-ghost:hover { background: var(--green-mid); color:#fff; transform: translateY(-2px); }
+
+/* --- Stats --- */
+.stats-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:12px; margin-top:8px; }
+.stat-card {
+  background: var(--card-bg); border-radius: var(--radius);
+  padding:16px 8px; text-align:center;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(212,175,55,.15);
+  transition: transform var(--transition);
+}
+.stat-card:hover { transform: scale(1.04); }
+.stat-value { display:block; font-size:1.35rem; font-weight:700; color: var(--green-light); }
+.stat-label { font-size:.68rem; color: var(--text-soft); letter-spacing:.3px; }
+
+/* --- Prayer --- */
+.location-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--card-bg); border-radius: var(--radius);
+  padding:12px 16px; box-shadow: var(--shadow);
+  font-size:.82rem; margin-bottom:16px;
+}
+.prayer-list { display:flex; flex-direction:column; gap:10px; }
+.prayer-item {
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--card-bg); border-radius: 14px;
+  padding:14px 18px; box-shadow: var(--shadow);
+  border-left: 4px solid var(--gold);
+  transition: transform var(--transition);
+}
+.prayer-item:hover { transform: translateX(4px); }
+.prayer-name { font-weight:600; color: var(--green-mid); }
+.prayer-time { font-size:.85rem; color: var(--text-soft); }
+.prayer-item.next { border-left-color: var(--green-light); animation: pulseBorder 2s infinite; }
+
+.prayer-tracker { display:grid; grid-template-columns: repeat(5,1fr); gap:10px; }
+.track-btn {
+  aspect-ratio:1; border-radius:14px; border:2px solid rgba(20,92,67,.2);
+  background: var(--card-bg); cursor:pointer; font-size:.7rem;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; color: var(--text-soft); font-family: var(--body-font);
+  transition: all var(--transition);
+}
+.track-btn.done {
+  background: var(--green-mid); color:#fff; border-color: var(--green-mid);
+  transform: scale(1.05);
+}
+.track-btn.done::after { content:'✓'; font-size:1.1rem; }
+
+/* Progress ring */
+.progress-ring-wrap { position:relative; width:140px; height:140px; margin:20px auto; }
+.progress-ring { transform: rotate(-90deg); width:140px; height:140px; }
+.ring-bg { fill:none; stroke: rgba(20,92,67,.12); stroke-width:10; }
+.ring-fill {
+  fill:none; stroke: var(--gold); stroke-width:10; stroke-linecap:round;
+  stroke-dasharray: 327; stroke-dashoffset: 327;
+  transition: stroke-dashoffset 1s ease;
+}
+.progress-text {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; font-weight:700; color: var(--green-mid);
+}
+
+/* --- Quran --- */
+.reciter-select {
+  display:flex; align-items:center; gap:10px; margin-bottom:14px;
+  background: var(--card-bg); padding:10px 16px; border-radius: 14px;
+  box-shadow: var(--shadow); font-size:.85rem;
+}
+.reciter-select select {
+  flex:1; border:none; background:transparent; font-family: var(--body-font);
+  color: var(--text); font-size:.85rem; outline:none; cursor:pointer;
+}
+.surah-list { display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+.surah-card {
+  background: var(--card-bg); border-radius: 14px; padding:12px;
+  box-shadow: var(--shadow); cursor:pointer; text-align:center;
+  border: 1px solid rgba(212,175,55,.15);
+  transition: all var(--transition);
+}
+.surah-card:hover { transform: translateY(-4px); border-color: var(--gold); }
+.surah-num {
+  display:inline-block; width:30px; height:30px; line-height:30px;
+  border-radius:50%; background: var(--green-mid); color:#fff;
+  font-size:.75rem; margin-bottom:6px;
+}
+.surah-name { font-family: var(--arabic-font); font-size:1.05rem; color: var(--green-mid); }
+.surah-en { font-size:.7rem; color: var(--text-soft); }
+
+.ayahs-container { margin-top:14px; }
+.ayah {
+  background: var(--card-bg); border-radius: 14px; padding:16px;
+  margin-bottom:12px; box-shadow: var(--shadow);
+  border-right: 3px solid var(--gold);
+  transition: transform var(--transition);
+}
+.ayah:hover { transform: translateX(-4px); }
+.ayah-arabic {
+  font-family: var(--arabic-font); font-size:1.4rem; line-height:2.1;
+  text-align:right; direction:rtl; color: var(--green-dark);
+}
+[data-theme="dark"] .ayah-arabic { color: var(--gold-soft); }
+.ayah-trans { font-size:.84rem; color: var(--text-soft); margin-top:8px; line-height:1.6; }
+.ayah-play {
+  margin-top:8px; background:none; border:none; cursor:pointer;
+  color: var(--green-light); font-size:.8rem; font-weight:600;
+}
+
+/* --- Names --- */
+.names-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
+.name-card {
+  background: var(--card-bg); border-radius: 16px; padding:18px 12px;
+  text-align:center; box-shadow: var(--shadow);
+  border: 1px solid rgba(212,175,55,.18);
+  cursor:default; transition: all var(--transition);
+  position:relative; overflow:hidden;
+}
+.name-card::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(135deg, transparent 40%, rgba(212,175,55,.08));
+  opacity:0; transition: opacity var(--transition);
+}
+.name-card:hover::before { opacity:1; }
+.name-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--gold); }
+.name-arabic { font-family: var(--arabic-font); font-size:1.5rem; color: var(--green-mid); margin-bottom:6px; }
+.name-translit { font-size:.78rem; font-weight:600; color: var(--gold); }
+.name-english { font-size:.68rem; color: var(--text-soft); margin-top:4px; }
+
+/* --- Tasbih --- */
+.tasbih-group-title {
+  font-size:.85rem; color: var(--green-mid); margin: 18px 0 10px;
+  font-weight: 600; letter-spacing: .3px;
+}
+.dhikr-selector { display:grid; grid-template-columns: repeat(2,1fr); gap:10px; margin-bottom:6px; }
+.dhikr-btn {
+  background: var(--card-bg); border: 2px solid rgba(20,92,67,.15);
+  border-radius: 14px; padding:12px; cursor:pointer;
+  font-family: var(--arabic-font); font-size:1.1rem;
+  color: var(--green-mid); transition: all var(--transition);
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.dhikr-btn small { font-family: var(--body-font); font-size:.65rem; color: var(--text-soft); }
+.dhikr-btn.active { border-color: var(--gold); background: rgba(212,175,55,.1); transform: scale(1.03); }
+
+/* Custom dua buttons */
+.dhikr-btn.custom {
+  font-family: var(--body-font);
+  font-size: .85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 34px;
+}
+.dhikr-btn.custom .del-dua {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(200,60,60,.15);
+  color: #b03030;
+  border: none;
+  cursor: pointer;
+  font-size: .75rem;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition);
+}
+.dhikr-btn.custom .del-dua:hover { background: rgba(200,60,60,.35); color:#fff; }
+.custom-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: .78rem;
+  color: var(--text-soft);
+  padding: 14px;
+  background: var(--card-bg);
+  border-radius: 14px;
+  border: 1px dashed rgba(20,92,67,.2);
+}
+
+.add-dua-bar {
+  display: flex; gap: 8px; margin-top: 10px;
+}
+.add-dua-bar input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 50px;
+  border: 1px solid rgba(20,92,67,.25);
+  background: var(--card-bg);
+  font-family: var(--body-font);
+  font-size: .82rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color var(--transition);
+}
+.add-dua-bar input:focus { border-color: var(--gold); }
+.add-dua-bar .btn-ghost { margin-top: 0; }
+
+.tasbih-counter-wrap { position:relative; display:flex; align-items:center; justify-content:center; margin:20px 0; }
+.tasbih-halo {
+  position:absolute; width:220px; height:220px; border-radius:50%;
+  border: 2px dashed rgba(212,175,55,.4);
+  animation: spinSlow 22s linear infinite;
+}
+.tasbih-btn {
+  width:180px; height:180px; border-radius:50%; border:none;
+  background: radial-gradient(circle at 35% 30%, var(--green-light), var(--green-dark));
+  color:#fff; cursor:pointer; font-family: var(--body-font);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  box-shadow: 0 0 0 8px rgba(212,175,55,.12), 0 12px 40px rgba(11,61,46,.35);
+  transition: transform .12s ease, box-shadow .3s ease;
+}
+.tasbih-btn:active { transform: scale(.94); box-shadow: 0 0 0 16px rgba(212,175,55,.18); }
+.tasbih-count { font-size:3rem; font-weight:700; }
+.tasbih-label { font-size:.75rem; letter-spacing:2px; opacity:.8; }
+.tasbih-actions { display:flex; justify-content:center; gap:12px; margin-top:10px; }
+.tasbih-current {
+  text-align:center; font-family: var(--arabic-font); font-size:1.6rem;
+  color: var(--green-mid); margin-top:18px;
+}
+
+/* --- Audio bar --- */
+.audio-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; gap:12px;
+  background: var(--green-dark); color:#fff;
+  padding:10px 16px; box-shadow: 0 -6px 24px rgba(0,0,0,.2);
+  animation: slideUp .4s ease both;
+}
+.audio-bar.hidden { display:none; }
+.audio-btn {
+  background: rgba(255,255,255,.15); border:none; color:#fff;
+  width:36px; height:36px; border-radius:50%; cursor:pointer;
+  font-size:.9rem; transition: background var(--transition);
+}
+.audio-btn:hover { background: rgba(255,255,255,.3); }
+.audio-info { flex:1; display:flex; flex-direction:column; gap:4px; font-size:.8rem; }
+.audio-progress { height:4px; background: rgba(255,255,255,.2); border-radius:4px; overflow:hidden; }
+.audio-progress div { height:100%; width:0; background: var(--gold); transition: width .2s linear; }
+
+/* --- Toast --- */
+.toast {
+  position:fixed; bottom:100px; left:50%; transform: translateX(-50%) translateY(20px);
+  background: var(--green-dark); color:#fff; padding:10px 22px; border-radius:50px;
+  font-size:.8rem; opacity:0; pointer-events:none;
+  transition: all .4s ease; z-index:500; box-shadow: var(--shadow);
+}
+.toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+
+/* --- Utility --- */
+.hidden { display:none !important; }
+
+/* --- Animations --- */
+@keyframes fadeUp { from { opacity:0; transform: translateY(18px); } to { opacity:1; transform: translateY(0); } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+@keyframes crescentGlow {
+  0%,100% { box-shadow: 22px 0 0 0 var(--gold), 0 0 40px rgba(212,175,55,.4); }
+  50% { box-shadow: 22px 0 0 0 var(--gold-soft), 0 0 70px rgba(212,175,55,.7); }
+}
+@keyframes pulseGlow { 0%,100% { opacity:.6; transform: translateX(-50%) scale(1); } 50% { opacity:1; transform: translateX(-50%) scale(1.15); } }
+@keyframes pulseBorder { 0%,100% { box-shadow: 0 0 0 0 rgba(20,92,67,.25); } 50% { box-shadow: 0 0 0 8px rgba(20,92,67,0); } }
+
+/* --- Responsive --- */
+@media (max-width:520px) {
+  .stats-grid { grid-template-columns: repeat(3,1fr); }
+  .prayer-tracker { grid-template-columns: repeat(3,1fr); }
+  .names-grid { grid-template-columns: repeat(2,1fr); }
+  .surah-list { grid-template-columns: repeat(2,1fr); }
+  .tasbih-btn { width:150px; height:150px; }
+  .tasbih-halo { width:190px; height:190px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
+
+/* ============================================
+   YEARLY PRAYER HEATMAP
+   ============================================ */
+
+.year-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.year-stat {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 12px 6px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(212,175,55,.15);
+  transition: transform var(--transition);
+}
+.year-stat:hover { transform: translateY(-3px); }
+.year-stat-value {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--green-light);
+}
+.year-stat-label {
+  font-size: .62rem;
+  color: var(--text-soft);
+  letter-spacing: .3px;
+}
+
+.heatmap-wrap {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(212,175,55,.15);
+  overflow-x: auto;
+  animation: fadeUp .5s ease both;
+}
+.heatmap-wrap::-webkit-scrollbar { height: 6px; }
+.heatmap-wrap::-webkit-scrollbar-thumb {
+  background: rgba(20,92,67,.3);
+  border-radius: 3px;
+}
+
+.heatmap-months {
+  display: grid;
+  grid-template-columns: repeat(53, 12px);
+  gap: 3px;
+  margin-bottom: 6px;
+  min-width: max-content;
+}
+.heatmap-month-label {
+  font-size: .55rem;
+  color: var(--text-soft);
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.heatmap {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 12px);
+  grid-auto-columns: 12px;
+  gap: 3px;
+  min-width: max-content;
+}
+.heat-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(20,92,67,.08);
+  transition: transform .15s ease, box-shadow .15s ease;
+  cursor: pointer;
+}
+.heat-cell:hover {
+  transform: scale(1.6);
+  box-shadow: 0 0 8px rgba(212,175,55,.6);
+  z-index: 2;
+  position: relative;
+}
+.heat-cell.level-1 { background: rgba(20,92,67,.30); }
+.heat-cell.level-2 { background: rgba(20,92,67,.50); }
+.heat-cell.level-3 { background: rgba(20,92,67,.70); }
+.heat-cell.level-4 { background: rgba(20,92,67,.88); }
+.heat-cell.level-5 { background: var(--gold); }
+.heat-cell.today {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+  animation: pulseBorder 2s infinite;
+}
+.heat-cell.future { opacity: .3; }
+.heat-cell.hidden-cell { visibility: hidden; }
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: flex-end;
+  margin-top: 12px;
+  font-size: .62rem;
+  color: var(--text-soft);
+}
+.legend-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+.legend-cell.level-0 { background: rgba(20,92,67,.08); }
+.legend-cell.level-1 { background: rgba(20,92,67,.30); }
+.legend-cell.level-2 { background: rgba(20,92,67,.50); }
+.legend-cell.level-3 { background: rgba(20,92,67,.70); }
+.legend-cell.level-4 { background: rgba(20,92,67,.88); }
+.legend-cell.level-5 { background: var(--gold); }
+
+@media (max-width:520px) {
+  .year-stats { grid-template-columns: repeat(2, 1fr); }
+}
