@@ -1,369 +1,526 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" dir="ltr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0b3d2e" />
-  <meta name="description" content="Reallanex — Khalid's offline Islamic companion." />
-  <meta name="author" content="Khalid (reallanex)" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Reallanex — Islamic Companion</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#0b3d2e" />
+    <meta
+      name="description"
+      content="Reallanex — Khalid's offline Islamic companion."
+    />
+    <meta name="author" content="Khalid (reallanex)" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Reallanex — Islamic Companion</title>
+  </head>
+  <body>
+    <canvas id="bg-canvas"></canvas>
 
-  <canvas id="bg-canvas"></canvas>
-
-  <!-- Splash -->
-  <div id="splash" class="splash">
-    <div class="splash-inner">
-      <div class="crescent"></div>
-      <h1 class="splash-title">Reallanex</h1>
-      <p class="splash-sub">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</p>
+    <!-- Splash -->
+    <div id="splash" class="splash">
+      <div class="splash-inner">
+        <div class="crescent"></div>
+        <h1 class="splash-title">Reallanex</h1>
+        <p class="splash-sub">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</p>
+      </div>
     </div>
-  </div>
 
-  <!-- Install banner -->
-  <div class="install-banner hidden" id="installBanner">
-    <i class="fa-solid fa-mobile-screen-button"></i>
-    <div class="install-text">
-      <strong>Install Reallanex</strong>
-      <span id="installSubtext">Works fully offline after install</span>
+    <!-- Install banner -->
+    <div class="install-banner hidden" id="installBanner">
+      <i class="fa-solid fa-mobile-screen-button"></i>
+      <div class="install-text">
+        <strong>Install Reallanex</strong>
+        <span id="installSubtext">Works fully offline after install</span>
+      </div>
+      <button type="button" class="install-btn" id="installBtn">Install</button>
+      <button type="button" class="install-close" id="installClose">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
-    <button type="button" class="install-btn" id="installBtn">Install</button>
-    <button type="button" class="install-close" id="installClose"><i class="fa-solid fa-xmark"></i></button>
-  </div>
 
-  <!-- Topbar -->
-  <header class="topbar">
-    <div class="brand">
-      <i class="fa-solid fa-mosque brand-icon"></i>
-      <span class="brand-name">Reallanex</span>
-    </div>
-    <div class="hijri-date" id="hijriDate"></div>
-    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-      <i class="fa-solid fa-moon"></i>
-    </button>
-  </header>
-
-  <!-- Tabs -->
-  <nav class="tabbar" id="tabbar">
-    <button type="button" class="tab active" data-view="home">
-      <i class="fa-solid fa-house"></i><span>Home</span>
-    </button>
-    <button type="button" class="tab" data-view="prayer">
-      <i class="fa-solid fa-kaaba"></i><span>Prayer</span>
-    </button>
-    <button type="button" class="tab" data-view="quran">
-      <i class="fa-solid fa-book-quran"></i><span>Quran</span>
-    </button>
-    <button type="button" class="tab" data-view="names">
-      <i class="fa-solid fa-star-and-crescent"></i><span>Names</span>
-    </button>
-    <button type="button" class="tab" data-view="tasbih">
-      <i class="fa-solid fa-circle-dot"></i><span>Tasbih</span>
-    </button>
-  </nav>
-
-  <main id="app">
-
-    <!-- HOME -->
-    <section class="view active" id="view-home">
-      <div class="hero">
-        <div class="hero-glow"></div>
-        <h2 class="hero-greeting" id="greeting">Assalamu Alaikum, Khalid</h2>
-        <p class="hero-sub">Welcome back, <strong>reallanex</strong></p>
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="brand">
+        <i class="fa-solid fa-mosque brand-icon"></i>
+        <span class="brand-name">Reallanex</span>
       </div>
+      <div class="hijri-date" id="hijriDate"></div>
+      <button
+        type="button"
+        class="theme-toggle"
+        id="themeToggle"
+        aria-label="Toggle theme"
+      >
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </header>
 
-      <div class="card motivation-card">
-        <h3><i class="fa-solid fa-lightbulb"></i> Daily Motivation</h3>
-        <p class="arabic" id="motivationArabic"></p>
-        <p class="translation" id="motivationText"></p>
-        <p class="reference" id="motivationRef"></p>
-        <button type="button" class="btn-ghost" id="newMotivation">
-          <i class="fa-solid fa-rotate"></i> New Quote
-        </button>
-      </div>
+    <!-- Tabs -->
+    <nav class="tabbar" id="tabbar">
+      <button type="button" class="tab active" data-view="home">
+        <i class="fa-solid fa-house"></i><span>Home</span>
+      </button>
+      <button type="button" class="tab" data-view="prayer">
+        <i class="fa-solid fa-kaaba"></i><span>Prayer</span>
+      </button>
+      <button type="button" class="tab" data-view="quran">
+        <i class="fa-solid fa-book-quran"></i><span>Quran</span>
+      </button>
+      <button type="button" class="tab" data-view="names">
+        <i class="fa-solid fa-star-and-crescent"></i><span>Names</span>
+      </button>
+      <button type="button" class="tab" data-view="tasbih">
+        <i class="fa-solid fa-circle-dot"></i><span>Tasbih</span>
+      </button>
+    </nav>
 
-      <div class="stats-grid">
-        <div class="stat-card">
-          <span class="stat-value" id="prayersDone">0/5</span>
-          <span class="stat-label">Prayers Today</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value" id="tasbihTotal">0</span>
-          <span class="stat-label">Tasbih Total</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value" id="streakDays">0</span>
-          <span class="stat-label">Day Streak</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRAYER -->
-    <section class="view" id="view-prayer">
-      <h2 class="section-title"><i class="fa-solid fa-kaaba"></i> Prayer</h2>
-
-      <!-- Sub-tabs: Day / Month / Year -->
-      <div class="prayer-subtabs" id="prayerSubtabs">
-        <button type="button" class="subtab active" data-psub="day">
-          <i class="fa-solid fa-sun"></i> Day
-        </button>
-        <button type="button" class="subtab" data-psub="month">
-          <i class="fa-solid fa-calendar-days"></i> Month
-        </button>
-        <button type="button" class="subtab" data-psub="year">
-          <i class="fa-solid fa-calendar"></i> Year
-        </button>
-      </div>
-
-      <!-- ===== DAY SUB-VIEW ===== -->
-      <div class="psub-view active" id="psub-day">
-        <div class="settings-row">
-          <label for="methodSelect">Method</label>
-          <select id="methodSelect">
-            <option value="MWL">Muslim World League</option>
-            <option value="ISNA">ISNA (North America)</option>
-            <option value="Egypt">Egyptian General Authority</option>
-            <option value="Makkah">Umm al-Qura (Makkah)</option>
-            <option value="Karachi">University of Karachi</option>
-          </select>
-          <label for="asrSelect">Asr</label>
-          <select id="asrSelect">
-            <option value="standard">Standard (Shafi'i/Maliki/Hanbali)</option>
-            <option value="hanafi">Hanafi</option>
-          </select>
+    <main id="app">
+      <!-- HOME -->
+      <section class="view active" id="view-home">
+        <div class="hero">
+          <div class="hero-glow"></div>
+          <h2 class="hero-greeting" id="greeting">Assalamu Alaikum, Khalid</h2>
+          <p class="hero-sub">Welcome back, <strong>reallanex</strong></p>
         </div>
 
-        <div class="location-bar">
-          <span id="locationLabel"><i class="fa-solid fa-location-dot"></i> Location not set</span>
-          <div>
-            <button type="button" class="btn-ghost" id="detectLocation">
-              <i class="fa-solid fa-crosshairs"></i> GPS
-            </button>
-            <button type="button" class="btn-ghost" id="manualLocation">
-              <i class="fa-solid fa-pen"></i> Manual
-            </button>
-          </div>
-        </div>
-
-        <div class="prayer-list" id="prayerList"></div>
-
-        <h3 class="sub-title">Mark as Prayed</h3>
-        <div class="prayer-tracker" id="prayerTracker"></div>
-
-        <h3 class="sub-title">Today's Progress</h3>
-        <div class="progress-ring-wrap">
-          <svg class="progress-ring" viewBox="0 0 120 120">
-            <circle class="ring-bg" cx="60" cy="60" r="52" />
-            <circle class="ring-fill" cx="60" cy="60" r="52" id="ringFill" />
-          </svg>
-          <div class="progress-text" id="progressText">0%</div>
-        </div>
-      </div>
-
-      <!-- ===== MONTH SUB-VIEW ===== -->
-      <div class="psub-view" id="psub-month">
-        <div class="month-header">
-          <button type="button" class="nav-btn" id="prevMonth" aria-label="Previous month">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <h3 id="monthTitle">—</h3>
-          <button type="button" class="nav-btn" id="nextMonth" aria-label="Next month">
-            <i class="fa-solid fa-chevron-right"></i>
+        <div class="card motivation-card">
+          <h3><i class="fa-solid fa-lightbulb"></i> Daily Motivation</h3>
+          <p class="arabic" id="motivationArabic"></p>
+          <p class="translation" id="motivationText"></p>
+          <p class="reference" id="motivationRef"></p>
+          <button type="button" class="btn-ghost" id="newMotivation">
+            <i class="fa-solid fa-rotate"></i> New Quote
           </button>
         </div>
 
-        <button type="button" class="btn-ghost today-jump" id="jumpToday">
-          <i class="fa-solid fa-crosshairs"></i> Jump to Today
-        </button>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-value" id="prayersDone">0/5</span>
+            <span class="stat-label">Prayers Today</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="tasbihTotal">0</span>
+            <span class="stat-label">Tasbih Total</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="streakDays">0</span>
+            <span class="stat-label">Day Streak</span>
+          </div>
+        </div>
+      </section>
 
-        <div class="month-dow">
-          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+      <!-- PRAYER -->
+      <section class="view" id="view-prayer">
+        <h2 class="section-title"><i class="fa-solid fa-kaaba"></i> Prayer</h2>
+
+        <!-- Sub-tabs: Day / Month / Year -->
+        <div class="prayer-subtabs" id="prayerSubtabs">
+          <button type="button" class="subtab active" data-psub="day">
+            <i class="fa-solid fa-sun"></i> Day
+          </button>
+          <button type="button" class="subtab" data-psub="month">
+            <i class="fa-solid fa-calendar-days"></i> Month
+          </button>
+          <button type="button" class="subtab" data-psub="year">
+            <i class="fa-solid fa-calendar"></i> Year
+          </button>
         </div>
 
-        <div class="month-grid" id="monthGrid"></div>
-
-        <div class="month-legend">
-          <span>0</span>
-          <div class="legend-cell level-0"></div>
-          <div class="legend-cell level-1"></div>
-          <div class="legend-cell level-2"></div>
-          <div class="legend-cell level-3"></div>
-          <div class="legend-cell level-4"></div>
-          <div class="legend-cell level-5"></div>
-          <span>5</span>
+        <!-- ===== DAY SUB-VIEW ===== -->
+        <div class="psub-view active" id="psub-day">
+                  <div class="settings-row">
+          <label for="tzSelect"><i class="fa-solid fa-globe"></i> Timezone</label>
+          <select id="tzSelect">
+            <option value="auto">Auto — my device clock</option>
+            <option value="1">UTC+01:00 (Lagos, Paris)</option>
+            <option value="0">UTC±00:00 (London)</option>
+            <option value="2">UTC+02:00 (Cairo, Berlin)</option>
+            <option value="3">UTC+03:00 (Makkah, Nairobi)</option>
+            <option value="3.5">UTC+03:30 (Tehran)</option>
+            <option value="4">UTC+04:00 (Dubai)</option>
+            <option value="4.5">UTC+04:30 (Kabul)</option>
+            <option value="5">UTC+05:00 (Karachi)</option>
+            <option value="5.5">UTC+05:30 (Mumbai, Delhi)</option>
+            <option value="5.75">UTC+05:45 (Kathmandu)</option>
+            <option value="6">UTC+06:00 (Dhaka)</option>
+            <option value="7">UTC+07:00 (Bangkok, Jakarta)</option>
+            <option value="8">UTC+08:00 (Beijing, Singapore)</option>
+            <option value="9">UTC+09:00 (Tokyo, Seoul)</option>
+            <option value="10">UTC+10:00 (Sydney)</option>
+            <option value="12">UTC+12:00 (Auckland)</option>
+            <option value="-5">UTC−05:00 (New York)</option>
+            <option value="-6">UTC−06:00 (Chicago)</option>
+            <option value="-7">UTC−07:00 (Denver)</option>
+            <option value="-8">UTC−08:00 (Los Angeles)</option>
+          </select>
+          <label><i class="fa-solid fa-clock"></i> Local</label>
+          <div class="clock-display" id="clockDisplay">—</div>
         </div>
 
-        <!-- Day detail panel (opens when a day is clicked) -->
-        <div class="day-detail hidden" id="dayDetail">
-          <div class="day-detail-header">
-            <h4 id="dayDetailTitle">—</h4>
-            <button type="button" class="close-detail" id="closeDayDetail" aria-label="Close">
-              <i class="fa-solid fa-xmark"></i>
+          <div class="prayer-list" id="prayerList"></div>
+
+          <h3 class="sub-title">Mark as Prayed</h3>
+
+          <div class="window-info" id="windowInfo">
+            <i class="fa-solid fa-clock"></i>
+            <span class="wi-text">—</span>
+            <span class="countdown"></span>
+          </div>
+
+          <div class="window-legend">
+            <span><span class="chip live"></span> Open now</span>
+            <span><span class="chip done"></span> Prayed</span>
+            <span><span class="chip missed"></span> Missed</span>
+            <span><span class="chip upcoming"></span> Upcoming</span>
+          </div>
+
+          <div class="prayer-tracker" id="prayerTracker"></div>
+
+          <h3 class="sub-title">Today's Progress</h3>
+          <div class="progress-ring-wrap">
+            <svg class="progress-ring" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="52" />
+              <circle class="ring-fill" cx="60" cy="60" r="52" id="ringFill" />
+            </svg>
+            <div class="progress-text" id="progressText">0%</div>
+          </div>
+        </div>
+
+        <!-- ===== MONTH SUB-VIEW ===== -->
+        <div class="psub-view" id="psub-month">
+          <div class="month-header">
+            <button
+              type="button"
+              class="nav-btn"
+              id="prevMonth"
+              aria-label="Previous month"
+            >
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <h3 id="monthTitle">—</h3>
+            <button
+              type="button"
+              class="nav-btn"
+              id="nextMonth"
+              aria-label="Next month"
+            >
+              <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
-          <div class="day-detail-btns" id="dayDetailBtns"></div>
-        </div>
-      </div>
 
-      <!-- ===== YEAR SUB-VIEW ===== -->
-      <div class="psub-view" id="psub-year">
-        <div class="year-stats">
-          <div class="year-stat"><span class="year-stat-value" id="yearTotalPrayers">0</span><span class="year-stat-label">Prayers</span></div>
-          <div class="year-stat"><span class="year-stat-value" id="yearDays">0</span><span class="year-stat-label">Active Days</span></div>
-          <div class="year-stat"><span class="year-stat-value" id="yearBestStreak">0</span><span class="year-stat-label">Best Streak</span></div>
-          <div class="year-stat"><span class="year-stat-value" id="yearPercent">0%</span><span class="year-stat-label">Completion</span></div>
-        </div>
+          <button type="button" class="btn-ghost today-jump" id="jumpToday">
+            <i class="fa-solid fa-crosshairs"></i> Jump to Today
+          </button>
 
-        <div class="heatmap-wrap">
-          <div class="heatmap-months" id="heatmapMonths"></div>
-          <div class="heatmap" id="heatmap"></div>
-          <div class="heatmap-legend">
-            <span>Less</span>
+          <div class="month-dow">
+            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span
+            ><span>Thu</span><span>Fri</span><span>Sat</span>
+          </div>
+
+          <div class="month-grid" id="monthGrid"></div>
+
+          <div class="month-legend">
+            <span>0</span>
             <div class="legend-cell level-0"></div>
             <div class="legend-cell level-1"></div>
             <div class="legend-cell level-2"></div>
             <div class="legend-cell level-3"></div>
             <div class="legend-cell level-4"></div>
             <div class="legend-cell level-5"></div>
-            <span>More</span>
+            <span>5</span>
+          </div>
+
+          <!-- Day detail panel (opens when a day is clicked) -->
+          <div class="day-detail hidden" id="dayDetail">
+            <div class="day-detail-header">
+              <h4 id="dayDetailTitle">—</h4>
+              <button
+                type="button"
+                class="close-detail"
+                id="closeDayDetail"
+                aria-label="Close"
+              >
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <div class="day-detail-btns" id="dayDetailBtns"></div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- QURAN -->
-    <section class="view" id="view-quran">
-      <h2 class="section-title"><i class="fa-solid fa-book-quran"></i> Al-Quran</h2>
+        <!-- ===== YEAR SUB-VIEW ===== -->
+        <div class="psub-view" id="psub-year">
+          <div class="year-stats">
+            <div class="year-stat">
+              <span class="year-stat-value" id="yearTotalPrayers">0</span
+              ><span class="year-stat-label">Prayers</span>
+            </div>
+            <div class="year-stat">
+              <span class="year-stat-value" id="yearDays">0</span
+              ><span class="year-stat-label">Active Days</span>
+            </div>
+            <div class="year-stat">
+              <span class="year-stat-value" id="yearBestStreak">0</span
+              ><span class="year-stat-label">Best Streak</span>
+            </div>
+            <div class="year-stat">
+              <span class="year-stat-value" id="yearPercent">0%</span
+              ><span class="year-stat-label">Completion</span>
+            </div>
+          </div>
 
-      <div class="download-card hidden" id="quranDownloadCard">
-        <i class="fa-solid fa-cloud-arrow-down download-icon"></i>
-        <h3>One-time download</h3>
-        <p>Download the full Quran once (~5 MB) to read it forever offline.</p>
-        <button type="button" class="btn-primary" id="downloadQuranBtn">
-          <i class="fa-solid fa-download"></i> Download Quran
-        </button>
-        <div class="progress-bar hidden" id="quranProgressWrap">
-          <div id="quranProgressBar"></div>
+          <div class="heatmap-wrap">
+            <div class="heatmap-months" id="heatmapMonths"></div>
+            <div class="heatmap" id="heatmap"></div>
+            <div class="heatmap-legend">
+              <span>Less</span>
+              <div class="legend-cell level-0"></div>
+              <div class="legend-cell level-1"></div>
+              <div class="legend-cell level-2"></div>
+              <div class="legend-cell level-3"></div>
+              <div class="legend-cell level-4"></div>
+              <div class="legend-cell level-5"></div>
+              <span>More</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div id="quranMain" class="hidden">
-        <div class="reciter-select">
-          <label for="reciter"><i class="fa-solid fa-microphone"></i></label>
-          <select id="reciter">
-            <option value="Alafasy_128kbps">Mishary Rashid Alafasy</option>
-            <option value="Abdul_Basit_Murattal_192kbps">Abdul Basit (Murattal)</option>
-            <option value="Abdurrahmaan_As-Sudais_192kbps">Abdurrahman As-Sudais</option>
-            <option value="Maher_AlMuaiqly_128kbps">Maher Al-Muaiqly</option>
-            <option value="Saud_Al-Shuraim_128kbps">Saud Al-Shuraim</option>
-            <option value="Ghamadi_40kbps">Saad Al-Ghamdi</option>
-          </select>
-        </div>
+      <!-- QURAN -->
+      <section class="view" id="view-quran">
+        <h2 class="section-title">
+          <i class="fa-solid fa-book-quran"></i> Al-Quran
+        </h2>
 
-        <div class="surah-list" id="surahList"></div>
-
-        <div class="quran-reader hidden" id="quranReader">
-          <button type="button" class="btn-ghost" id="backToSurahs">
-            <i class="fa-solid fa-arrow-left"></i> Back
+        <div class="download-card hidden" id="quranDownloadCard">
+          <i class="fa-solid fa-cloud-arrow-down download-icon"></i>
+          <h3>One-time download</h3>
+          <p>
+            Download the full Quran once (~5 MB) to read it forever offline.
+          </p>
+          <button type="button" class="btn-primary" id="downloadQuranBtn">
+            <i class="fa-solid fa-download"></i> Download Quran
           </button>
-          <h3 id="surahTitle"></h3>
-          <div class="reader-controls">
-            <button type="button" class="btn-ghost" id="downloadSurahAudio">
-              <i class="fa-solid fa-download"></i> Download audio
-            </button>
-            <span class="audio-status" id="audioStatus"></span>
+          <div class="progress-bar hidden" id="quranProgressWrap">
+            <div id="quranProgressBar"></div>
           </div>
-          <div id="ayahsContainer" class="ayahs-container"></div>
+        </div>
+
+        <div id="quranMain" class="hidden">
+          <div class="reciter-select">
+            <label for="reciter"><i class="fa-solid fa-microphone"></i></label>
+            <select id="reciter">
+              <option value="Alafasy_128kbps">Mishary Rashid Alafasy</option>
+              <option value="Abdul_Basit_Murattal_192kbps">
+                Abdul Basit (Murattal)
+              </option>
+              <option value="Abdurrahmaan_As-Sudais_192kbps">
+                Abdurrahman As-Sudais
+              </option>
+              <option value="Maher_AlMuaiqly_128kbps">Maher Al-Muaiqly</option>
+              <option value="Saud_Al-Shuraim_128kbps">Saud Al-Shuraim</option>
+              <option value="Ghamadi_40kbps">Saad Al-Ghamdi</option>
+            </select>
+          </div>
+
+          <div class="surah-list" id="surahList"></div>
+
+          <div class="quran-reader hidden" id="quranReader">
+            <button type="button" class="btn-ghost" id="backToSurahs">
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <h3 id="surahTitle"></h3>
+            <div class="reader-controls">
+              <button type="button" class="btn-ghost" id="downloadSurahAudio">
+                <i class="fa-solid fa-download"></i> Download audio
+              </button>
+              <span class="audio-status" id="audioStatus"></span>
+            </div>
+            <div id="ayahsContainer" class="ayahs-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NAMES -->
+      <section class="view" id="view-names">
+        <h2 class="section-title">
+          <i class="fa-solid fa-star-and-crescent"></i> 99 Names of Allah
+        </h2>
+        <p class="section-sub">Asma ul-Husna — The Most Beautiful Names</p>
+        <div class="names-grid" id="namesGrid"></div>
+      </section>
+
+      <!-- TASBIH -->
+      <section class="view" id="view-tasbih">
+        <h2 class="section-title">
+          <i class="fa-solid fa-circle-dot"></i> Tasbih
+        </h2>
+        <p class="section-sub">Free counter for dhikr and personal duas</p>
+
+        <h4 class="tasbih-group-title">
+          <i class="fa-solid fa-mosque"></i> Preset Dhikr
+        </h4>
+        <div class="dhikr-selector" id="dhikrSelector">
+          <button
+            type="button"
+            class="dhikr-btn active"
+            data-dhikr="سُبْحَانَ اللَّهِ"
+          >
+            سُبْحَانَ اللَّهِ<br /><small>SubhanAllah</small>
+          </button>
+          <button
+            type="button"
+            class="dhikr-btn"
+            data-dhikr="الْحَمْدُ لِلَّهِ"
+          >
+            الْحَمْدُ لِلَّهِ<br /><small>Alhamdulillah</small>
+          </button>
+          <button type="button" class="dhikr-btn" data-dhikr="اللَّهُ أَكْبَرُ">
+            اللَّهُ أَكْبَرُ<br /><small>Allahu Akbar</small>
+          </button>
+          <button
+            type="button"
+            class="dhikr-btn"
+            data-dhikr="لَا إِلَٰهَ إِلَّا اللَّهُ"
+          >
+            لَا إِلَٰهَ إِلَّا اللَّهُ<br /><small>La ilaha illallah</small>
+          </button>
+          <button
+            type="button"
+            class="dhikr-btn"
+            data-dhikr="أَسْتَغْفِرُ اللَّهَ"
+          >
+            أَسْتَغْفِرُ اللَّهَ<br /><small>Astaghfirullah</small>
+          </button>
+          <button
+            type="button"
+            class="dhikr-btn"
+            data-dhikr="لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ"
+          >
+            لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ<br /><small
+              >La hawla wa la quwwata illa billah</small
+            >
+          </button>
+          <button
+            type="button"
+            class="dhikr-btn"
+            data-dhikr="سُبْحَانَ اللَّهِ وَبِحَمْدِهِ"
+          >
+            سُبْحَانَ اللَّهِ وَبِحَمْدِهِ<br /><small
+              >SubhanAllahi wa bihamdih</small
+            >
+          </button>
+          <button
+            type="button"
+            class="dhikr-btn"
+            data-dhikr="اللَّهُمَّ صَلِّ عَلَى مُحَمَّد"
+          >
+            اللَّهُمَّ صَلِّ عَلَى مُحَمَّد<br /><small>Salawat</small>
+          </button>
+        </div>
+
+        <h4 class="tasbih-group-title">
+          <i class="fa-solid fa-hands-praying"></i> My Personal Duas
+        </h4>
+        <div class="dhikr-selector" id="customDhikrSelector"></div>
+        <div class="add-dua-bar">
+          <input
+            type="text"
+            id="newDuaInput"
+            placeholder="Add your own dua…"
+            maxlength="80"
+          />
+          <button type="button" class="btn-ghost" id="addDuaBtn">
+            <i class="fa-solid fa-plus"></i> Add
+          </button>
+        </div>
+
+        <div class="tasbih-counter-wrap">
+          <div class="tasbih-halo"></div>
+          <button
+            type="button"
+            class="tasbih-btn"
+            id="tasbihBtn"
+            aria-label="Increment counter"
+          >
+            <span class="tasbih-count" id="tasbihCount">0</span>
+            <span class="tasbih-label">TAP</span>
+          </button>
+        </div>
+
+        <div class="tasbih-actions">
+          <button type="button" class="btn-ghost" id="tasbihReset">
+            <i class="fa-solid fa-rotate-left"></i> Reset
+          </button>
+          <button type="button" class="btn-ghost" id="tasbihTarget">
+            <i class="fa-solid fa-bullseye"></i> Target: 33
+          </button>
+        </div>
+        <p class="tasbih-current" id="currentDhikr">سُبْحَانَ اللَّهِ</p>
+        <p class="tasbih-hint">
+          Tap the circle, or press <kbd>Space</kbd> / <kbd>Enter</kbd> /
+          <kbd>+</kbd>
+        </p>
+      </section>
+    </main>
+
+    <!-- Audio bar -->
+    <div class="audio-bar hidden" id="audioBar">
+      <button type="button" id="audioPlayPause" class="audio-btn">
+        <i class="fa-solid fa-play"></i>
+      </button>
+      <div class="audio-info">
+        <span id="audioTitle">—</span>
+        <div class="audio-progress"><div id="audioProgress"></div></div>
+      </div>
+      <button type="button" id="audioClose" class="audio-btn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Manual location modal -->
+    <div class="modal-overlay hidden" id="manualModal">
+      <div class="modal">
+        <h3>Enter your location</h3>
+        <input
+          type="number"
+          id="latInput"
+          placeholder="Latitude (e.g. 24.7136)"
+          step="0.0001"
+        />
+        <input
+          type="number"
+          id="lngInput"
+          placeholder="Longitude (e.g. 46.6753)"
+          step="0.0001"
+        />
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="manualCancel">
+            Cancel
+          </button>
+          <button type="button" class="btn-primary" id="manualSave">
+            Save
+          </button>
         </div>
       </div>
-    </section>
-
-    <!-- NAMES -->
-    <section class="view" id="view-names">
-      <h2 class="section-title"><i class="fa-solid fa-star-and-crescent"></i> 99 Names of Allah</h2>
-      <p class="section-sub">Asma ul-Husna — The Most Beautiful Names</p>
-      <div class="names-grid" id="namesGrid"></div>
-    </section>
-
-    <!-- TASBIH -->
-    <section class="view" id="view-tasbih">
-      <h2 class="section-title"><i class="fa-solid fa-circle-dot"></i> Tasbih</h2>
-      <p class="section-sub">Free counter for dhikr and personal duas</p>
-
-      <h4 class="tasbih-group-title"><i class="fa-solid fa-mosque"></i> Preset Dhikr</h4>
-      <div class="dhikr-selector" id="dhikrSelector">
-        <button type="button" class="dhikr-btn active" data-dhikr="سُبْحَانَ اللَّهِ">سُبْحَانَ اللَّهِ<br><small>SubhanAllah</small></button>
-        <button type="button" class="dhikr-btn" data-dhikr="الْحَمْدُ لِلَّهِ">الْحَمْدُ لِلَّهِ<br><small>Alhamdulillah</small></button>
-        <button type="button" class="dhikr-btn" data-dhikr="اللَّهُ أَكْبَرُ">اللَّهُ أَكْبَرُ<br><small>Allahu Akbar</small></button>
-        <button type="button" class="dhikr-btn" data-dhikr="لَا إِلَٰهَ إِلَّا اللَّهُ">لَا إِلَٰهَ إِلَّا اللَّهُ<br><small>La ilaha illallah</small></button>
-        <button type="button" class="dhikr-btn" data-dhikr="أَسْتَغْفِرُ اللَّهَ">أَسْتَغْفِرُ اللَّهَ<br><small>Astaghfirullah</small></button>
-        <button type="button" class="dhikr-btn" data-dhikr="لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ">لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ<br><small>La hawla wa la quwwata illa billah</small></button>
-        <button type="button" class="dhikr-btn" data-dhikr="سُبْحَانَ اللَّهِ وَبِحَمْدِهِ">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ<br><small>SubhanAllahi wa bihamdih</small></button>
-        <button type="button" class="dhikr-btn" data-dhikr="اللَّهُمَّ صَلِّ عَلَى مُحَمَّد">اللَّهُمَّ صَلِّ عَلَى مُحَمَّد<br><small>Salawat</small></button>
-      </div>
-
-      <h4 class="tasbih-group-title"><i class="fa-solid fa-hands-praying"></i> My Personal Duas</h4>
-      <div class="dhikr-selector" id="customDhikrSelector"></div>
-      <div class="add-dua-bar">
-        <input type="text" id="newDuaInput" placeholder="Add your own dua…" maxlength="80" />
-        <button type="button" class="btn-ghost" id="addDuaBtn"><i class="fa-solid fa-plus"></i> Add</button>
-      </div>
-
-      <div class="tasbih-counter-wrap">
-        <div class="tasbih-halo"></div>
-        <button type="button" class="tasbih-btn" id="tasbihBtn" aria-label="Increment counter">
-          <span class="tasbih-count" id="tasbihCount">0</span>
-          <span class="tasbih-label">TAP</span>
-        </button>
-      </div>
-
-      <div class="tasbih-actions">
-        <button type="button" class="btn-ghost" id="tasbihReset"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-        <button type="button" class="btn-ghost" id="tasbihTarget"><i class="fa-solid fa-bullseye"></i> Target: 33</button>
-      </div>
-      <p class="tasbih-current" id="currentDhikr">سُبْحَانَ اللَّهِ</p>
-      <p class="tasbih-hint">Tap the circle, or press <kbd>Space</kbd> / <kbd>Enter</kbd> / <kbd>+</kbd></p>
-    </section>
-
-  </main>
-
-  <!-- Audio bar -->
-  <div class="audio-bar hidden" id="audioBar">
-    <button type="button" id="audioPlayPause" class="audio-btn"><i class="fa-solid fa-play"></i></button>
-    <div class="audio-info">
-      <span id="audioTitle">—</span>
-      <div class="audio-progress"><div id="audioProgress"></div></div>
     </div>
-    <button type="button" id="audioClose" class="audio-btn"><i class="fa-solid fa-xmark"></i></button>
-  </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
-
-  <!-- Manual location modal -->
-  <div class="modal-overlay hidden" id="manualModal">
-    <div class="modal">
-      <h3>Enter your location</h3>
-      <input type="number" id="latInput" placeholder="Latitude (e.g. 24.7136)" step="0.0001" />
-      <input type="number" id="lngInput" placeholder="Longitude (e.g. 46.6753)" step="0.0001" />
-      <div class="modal-actions">
-        <button type="button" class="btn-ghost" id="manualCancel">Cancel</button>
-        <button type="button" class="btn-primary" id="manualSave">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/app.js"></script>
-  <script src="js/prayer.js"></script>
-  <script src="js/quran.js"></script>
-  <script src="js/names.js"></script>
-  <script src="js/tasbih.js"></script>
-</body>
+    <script src="js/app.js"></script>
+    <script src="js/prayer.js"></script>
+    <script src="js/quran.js"></script>
+    <script src="js/names.js"></script>
+    <script src="js/tasbih.js"></script>
+  </body>
 </html>

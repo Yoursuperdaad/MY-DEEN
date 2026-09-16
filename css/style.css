@@ -804,4 +804,154 @@ button { font-family: inherit; }
   .month-dots .dot { width: 3px; height: 3px; }
   .day-detail-btn { font-size: .52rem; }
   .day-detail-btn i { font-size: .9rem; }
+}/* ============================================================
+   PRAYER TIME-WINDOW ENFORCEMENT (v2.2)
+   ============================================================ */
+
+/* Window info banner */
+.window-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card-bg);
+  border-left: 3px solid var(--green-light);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  font-size: .78rem;
+  color: var(--text-soft);
 }
+.window-info > i { color: var(--gold); font-size: .9rem; }
+.window-info strong { color: var(--green-mid); font-weight: 700; }
+.window-info .wi-text { flex: 1; }
+.window-info .countdown {
+  font-family: 'Courier New', monospace;
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--green-light);
+  letter-spacing: .5px;
+  min-width: 58px;
+  text-align: right;
+}
+
+/* Legend */
+.window-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: .68rem;
+  color: var(--text-soft);
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+.window-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.window-legend .chip {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+.window-legend .chip.live     { background: rgba(30,122,90,.20); border-color: var(--green-light); }
+.window-legend .chip.done     { background: var(--green-mid); }
+.window-legend .chip.missed   { background: rgba(180,60,60,.15); border-color: rgba(180,60,60,.5); }
+.window-legend .chip.upcoming { background: rgba(0,0,0,.06); }
+[data-theme="dark"] .window-legend .chip.upcoming { background: rgba(255,255,255,.08); }
+
+/* Track button — 4-state machine */
+.track-btn {
+  position: relative;
+  transition: transform .2s ease, background .25s ease,
+              border-color .25s ease, color .25s ease, opacity .25s ease;
+}
+.track-btn.live {
+  border-color: var(--green-light);
+  background: rgba(30,122,90,.10);
+  color: var(--green-mid);
+  animation: pulseBorder 2.2s ease-in-out infinite;
+}
+.track-btn.live:hover { transform: translateY(-2px); }
+
+.track-btn.done {
+  cursor: not-allowed;
+}
+
+.track-btn.missed {
+  background: rgba(180,60,60,.10);
+  border-color: rgba(180,60,60,.35);
+  color: #a04040;
+  cursor: not-allowed;
+}
+.track-btn.missed i::before { content: '\f00d'; } /* fa-xmark */
+[data-theme="dark"] .track-btn.missed {
+  background: rgba(220,90,90,.14);
+  color: #e08585;
+  border-color: rgba(220,90,90,.4);
+}
+
+.track-btn.upcoming {
+  opacity: .42;
+  cursor: not-allowed;
+}
+.track-btn.upcoming i::before { content: '\f017'; } /* fa-clock */
+
+/* Day-detail panel buttons — same 4 states */
+.day-detail-btn.live {
+  border-color: var(--green-light);
+  background: rgba(30,122,90,.10);
+  animation: pulseBorder 2.2s ease-in-out infinite;
+}
+.day-detail-btn.done     { cursor: not-allowed; }
+.day-detail-btn.missed {
+  background: rgba(180,60,60,.10);
+  border-color: rgba(180,60,60,.35);
+  color: #a04040;
+  cursor: not-allowed;
+}
+.day-detail-btn.missed i::before { content: '\f00d'; }
+[data-theme="dark"] .day-detail-btn.missed {
+  background: rgba(220,90,90,.14);
+  color: #e08585;
+  border-color: rgba(220,90,90,.4);
+}
+.day-detail-btn.upcoming {
+  opacity: .42;
+  cursor: not-allowed;
+}
+.day-detail-btn.upcoming i::before { content: '\f017'; }
+
+/* Month cell — differentiate missed days subtly via red dots */
+.month-dots .dot.missed {
+  background: rgba(180,60,60,.55);
+}/* ============================================================
+   TIMEZONE & LIVE CLOCK (v2.3)
+   ============================================================ */
+.settings-row select#tzSelect { max-width: 100%; }
+.clock-display {
+  font-family: 'Courier New', monospace;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--green-light);
+  letter-spacing: .5px;
+  padding: 6px 10px;
+  background: rgba(30,122,90,.08);
+  border-radius: 8px;
+  border: 1px solid rgba(30,122,90,.20);
+  min-width: 100px;
+  text-align: center;
+}
+[data-theme="dark"] .clock-display {
+  background: rgba(30,122,90,.18);
+  border-color: rgba(30,122,90,.4);
+}
+.tz-note {
+  grid-column: 1 / -1;
+  font-size: .68rem;
+  color: var(--text-soft);
+  margin-top: -4px;
+  padding-left: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tz-note i { color: var(--gold); }
