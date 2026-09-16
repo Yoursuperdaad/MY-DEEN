@@ -1,5 +1,6 @@
 /* ============================================
    tasbih.js — Standalone Tasbih (personal duas)
+   v2.1 — mobile tap fix + extended keyboard
    Author: Khalid (reallanex)
    ============================================ */
 
@@ -16,6 +17,7 @@ const Tasbih = (() => {
     customDuas: JSON.parse(localStorage.getItem(STORAGE_CUSTOM) || "[]"),
   };
   let initialized = false;
+  let lastFire = 0;
 
   const vibrate = (p = 18) => {
     if (navigator.vibrate) navigator.vibrate(p);
@@ -32,10 +34,17 @@ const Tasbih = (() => {
   }
 
   function increment() {
+    // Debounce so pointerdown + click don't double-fire
+    const now = Date.now();
+    if (now - lastFire < 80) return;
+    lastFire = now;
+
     state.count++;
     state.total++;
     vibrate();
     update();
+    App.updateHomeStats();
+
     if (state.count === state.target) {
       App.toast(`🎉 ${state.target} completed! MashaAllah`);
       vibrate([40, 30, 40]);
@@ -62,7 +71,6 @@ const Tasbih = (() => {
     update();
   }
 
-  /* ---------- Custom duas ---------- */
   const saveCustom = () =>
     localStorage.setItem(STORAGE_CUSTOM, JSON.stringify(state.customDuas));
 
@@ -76,9 +84,10 @@ const Tasbih = (() => {
     }
     state.customDuas.forEach((dua, i) => {
       const btn = document.createElement("button");
+      btn.type = "button";
       btn.className = "dhikr-btn custom";
       if (dua === state.dhikr) btn.classList.add("active");
-      btn.innerHTML = `${escapeHtml(dua)}<button class="del-dua" title="Remove"><i class="fa-solid fa-xmark"></i></button>`;
+      btn.innerHTML = `${escapeHtml(dua)}<button type="button" class="del-dua" title="Remove"><i class="fa-solid fa-xmark"></i></button>`;
       btn.addEventListener("click", (e) => {
         if (e.target.closest(".del-dua")) return;
         setActive(dua, btn);
@@ -130,11 +139,67 @@ const Tasbih = (() => {
     return d.innerHTML;
   }
 
+  /* ---------- Keyboard handling ---------- */
+  function handleKeydown(e) {
+    if (!document.getElementById("view-tasbih").classList.contains("active"))
+      return;
+
+    // Ignore keystrokes inside inputs
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (
+      tag === "INPUT" ||
+      tag === "TEXTAREA" ||
+      document.activeElement.isContentEditable
+    )
+      return;
+
+    // Space, Enter, NumpadEnter, NumpadAdd, and literal "+"
+    const code = e.code;
+    const key = e.key;
+    const isIncrement =
+      code === "Space" ||
+      code === "Enter" ||
+      code === "NumpadEnter" ||
+      code === "NumpadAdd" ||
+      key === "+" ||
+      key === "=" ||
+      key === "Add";
+
+    if (isIncrement) {
+      e.preventDefault();
+      increment();
+    }
+  }
+
+  /* ---------- Init ---------- */
   function init() {
     if (!initialized) {
       initialized = true;
 
-      document.getElementById("tasbihBtn").addEventListener("click", increment);
+      const btn = document.getElementById("tasbihBtn");
+
+      // Primary handler: pointerdown fires instantly on touch + mouse
+      btn.addEventListener("pointerdown", (e) => {
+        if (e.cancelable) e.preventDefault();
+        increment();
+      });
+
+      // Fallback for browsers without PointerEvent
+      if (!window.PointerEvent) {
+        btn.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.cancelable) e.preventDefault();
+            increment();
+          },
+          { passive: false },
+        );
+        btn.addEventListener("mousedown", (e) => {
+          if (e.cancelable) e.preventDefault();
+          increment();
+        });
+      }
+
       document.getElementById("tasbihReset").addEventListener("click", reset);
       document.getElementById("tasbihTarget").addEventListener("click", () => {
         const targets = [33, 99, 100, 500, 1000];
@@ -144,8 +209,10 @@ const Tasbih = (() => {
         App.toast(`Target set to ${state.target}`);
       });
 
-      document.querySelectorAll("#dhikrSelector .dhikr-btn").forEach((btn) => {
-        btn.addEventListener("click", () => setActive(btn.dataset.dhikr, btn));
+      document.querySelectorAll("#dhikrSelector .dhikr-btn").forEach((btn2) => {
+        btn2.addEventListener("click", () =>
+          setActive(btn2.dataset.dhikr, btn2),
+        );
       });
 
       document.getElementById("addDuaBtn").addEventListener("click", addCustom);
@@ -155,20 +222,10 @@ const Tasbih = (() => {
           if (e.key === "Enter") addCustom();
         });
 
-      document.addEventListener("keydown", (e) => {
-        if (
-          e.code === "Space" &&
-          document.getElementById("view-tasbih").classList.contains("active")
-        ) {
-          const tag = document.activeElement.tagName;
-          if (tag === "INPUT" || tag === "TEXTAREA") return;
-          e.preventDefault();
-          increment();
-        }
-      });
+      // Extended keyboard support (Space / Enter / Numpad Enter / +)
+      document.addEventListener("keydown", handleKeydown);
 
       renderCustom();
-      // Restore active preset if matching
       document.querySelectorAll("#dhikrSelector .dhikr-btn").forEach((b) => {
         if (b.dataset.dhikr === state.dhikr) b.classList.add("active");
       });

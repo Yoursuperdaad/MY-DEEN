@@ -1,6 +1,6 @@
 /* ============================================
-   prayer.js — Offline prayer times & tracker
-   Pure math calculation — no internet needed
+   prayer.js — Offline prayer times, tracker,
+   interactive Month & Year calendar
    Author: Khalid (reallanex)
    ============================================ */
 
@@ -15,7 +15,7 @@ const Prayer = (() => {
     MWL: { fajr: 18, isha: 17 },
     ISNA: { fajr: 15, isha: 15 },
     Egypt: { fajr: 19.5, isha: 17.5 },
-    Makkah: { fajr: 18.5, isha: 90 /* minutes after maghrib */ },
+    Makkah: { fajr: 18.5, isha: 90 },
     Karachi: { fajr: 18, isha: 18 },
   };
 
@@ -33,15 +33,63 @@ const Prayer = (() => {
     return a < 0 ? a + 24 : a;
   };
 
+  const MONTH_NAMES = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   let coords = null;
   let times = null;
   let initialized = false;
+  let currentSubtab = "day";
+  let monthCursor = new Date(); // which month the Month view is showing
+  let selectedDayKey = null; // for the day-detail panel
 
-  /* ---------- Storage helpers ---------- */
+  /* ---------- Storage ---------- */
   const getLog = () => JSON.parse(localStorage.getItem(STORAGE_LOG) || "{}");
   const saveLog = (l) => localStorage.setItem(STORAGE_LOG, JSON.stringify(l));
-  const todayKey = (d = new Date()) =>
-    `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  const keyFor = (d) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  const todayKey = (d = new Date()) => keyFor(d);
+
+  const countFor = (dateKey) => {
+    const log = getLog();
+    const day = log[dateKey] || {};
+    return PRAYERS.filter((p) => day[p]).length;
+  };
+
+  /* ---------- Central mutation (single source of truth) ---------- */
+  function setPrayer(dateKey, prayerName, value) {
+    const log = getLog();
+    if (!log[dateKey]) log[dateKey] = {};
+    log[dateKey][prayerName] = !!value;
+    // If all false, remove the day to keep storage tiny
+    if (!PRAYERS.some((p) => log[dateKey][p])) delete log[dateKey];
+    saveLog(log);
+
+    // Refresh every dependent view (cheap, all synchronous)
+    renderTracker(); // Day view buttons
+    updateProgress(); // Ring + yearly
+    updateStats(); // (home-level counters)
+    if (currentSubtab === "month") renderMonthGrid();
+    if (selectedDayKey) renderDayDetail(selectedDayKey);
+    App.updateHomeStats();
+  }
+
+  function togglePrayer(dateKey, prayerName) {
+    const log = getLog();
+    const current = !!(log[dateKey] && log[dateKey][prayerName]);
+    setPrayer(dateKey, prayerName, !current);
+  }
 
   /* ---------- Astronomy ---------- */
   function julianDate(y, m, d) {
@@ -59,7 +107,6 @@ const Prayer = (() => {
       1524.5
     );
   }
-
   function sunPosition(jd) {
     const D = jd - 2451545.0;
     const g = fixAngle(357.529 + 0.98560028 * D);
@@ -71,9 +118,7 @@ const Prayer = (() => {
     const decl = darcsin(dsin(e) * dsin(L));
     return { declination: decl, equation: eqt };
   }
-
   const midDay = (jd, t) => fixHour(12 - sunPosition(jd + t).equation);
-
   function sunAngleTime(jd, lat, angle, t, ccw) {
     const decl = sunPosition(jd + t).declination;
     const noon = midDay(jd, t);
@@ -82,36 +127,26 @@ const Prayer = (() => {
     const H = darccos(cosH) / 15;
     return noon + (ccw ? -H : H);
   }
-
   function asrTime(jd, lat, factor, t) {
     const decl = sunPosition(jd + t).declination;
     const angle = -darccot(factor + dtan(Math.abs(lat - decl)));
     return sunAngleTime(jd, lat, angle, t, false);
   }
-
   function calculate(date, lat, lng, tz, method, asrJuristic) {
     const jd =
       julianDate(date.getFullYear(), date.getMonth() + 1, date.getDate()) -
       lng / (15 * 24);
     const m = METHODS[method] || METHODS.MWL;
     const asrFactor = asrJuristic === "hanafi" ? 2 : 1;
-
     const fajr = sunAngleTime(jd, lat, m.fajr, 5 / 24, true);
     const sunrise = sunAngleTime(jd, lat, 0.833, 6 / 24, true);
     const dhuhr = midDay(jd, 12 / 24) + 1 / 60;
     const asr = asrTime(jd, lat, asrFactor, 13 / 24);
     const sunset = sunAngleTime(jd, lat, 0.833, 18 / 24, false);
     const maghrib = sunset + 1 / 60;
-
     let isha;
-    if (typeof m.isha === "number" && m.isha > 60) {
-      // Makkah method — minutes after maghrib
-      isha = maghrib + m.isha / 60;
-    } else {
-      isha = sunAngleTime(jd, lat, m.isha, 18 / 24, false);
-    }
-
-    // Convert UTC to local using browser timezone offset
+    if (typeof m.isha === "number" && m.isha > 60) isha = maghrib + m.isha / 60;
+    else isha = sunAngleTime(jd, lat, m.isha, 18 / 24, false);
     const adjust = tz - lng / 15;
     return {
       Fajr: fixHour(fajr + adjust),
@@ -122,37 +157,28 @@ const Prayer = (() => {
       Isha: fixHour(isha + adjust),
     };
   }
-
-  function toHHMM(hoursFloat) {
-    const total = Math.round(hoursFloat * 60);
-    const hh = Math.floor(total / 60) % 24;
-    const mm = total % 60;
-    return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
-  }
-
-  function formatTime(hhmm) {
+  const toHHMM = (h) => {
+    const total = Math.round(h * 60);
+    return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+  };
+  const formatTime = (hhmm) => {
     const [h, m] = hhmm.split(":").map(Number);
     const ampm = h >= 12 ? "PM" : "AM";
-    const h12 = h % 12 || 12;
-    return `${h12}:${String(m).padStart(2, "0")} ${ampm}`;
-  }
+    return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${ampm}`;
+  };
 
-  /* ---------- Compute & render ---------- */
   function computeTimes() {
     if (!coords) return null;
     const method = localStorage.getItem(STORAGE_METHOD) || "MWL";
     const asrJ = localStorage.getItem(STORAGE_ASR) || "standard";
     const tz = -new Date().getTimezoneOffset() / 60;
-
     const raw = calculate(new Date(), coords.lat, coords.lng, tz, method, asrJ);
-    const formatted = {};
-    Object.keys(raw).forEach((k) => {
-      formatted[k] = toHHMM(raw[k]);
-    });
-    return formatted;
+    const out = {};
+    Object.keys(raw).forEach((k) => (out[k] = toHHMM(raw[k])));
+    return out;
   }
 
-  function refresh() {
+  function refreshDayView() {
     times = computeTimes();
     if (!times) return;
     renderTimes();
@@ -161,18 +187,16 @@ const Prayer = (() => {
     updateStats();
   }
 
-  function iconFor(name) {
-    return (
-      {
-        Fajr: "fa-cloud-sun",
-        Dhuhr: "fa-sun",
-        Asr: "fa-cloud-sun",
-        Maghrib: "fa-sun",
-        Isha: "fa-moon",
-      }[name] || "fa-kaaba"
-    );
-  }
+  const iconFor = (name) =>
+    ({
+      Fajr: "fa-cloud-sun",
+      Dhuhr: "fa-sun",
+      Asr: "fa-cloud-sun",
+      Maghrib: "fa-sun",
+      Isha: "fa-moon",
+    })[name] || "fa-kaaba";
 
+  /* ---------- Day view: prayer times ---------- */
   function renderTimes() {
     const list = document.getElementById("prayerList");
     list.innerHTML = "";
@@ -182,8 +206,7 @@ const Prayer = (() => {
     const nowMin = now.getHours() * 60 + now.getMinutes();
 
     PRAYERS.forEach((name) => {
-      const t = times[name];
-      const [h, m] = t.split(":").map(Number);
+      const [h, m] = times[name].split(":").map(Number);
       const pMin = h * 60 + m;
       const isNext =
         pMin >= nowMin &&
@@ -198,7 +221,7 @@ const Prayer = (() => {
       div.innerHTML = `
         <div>
           <div class="prayer-name">${name}</div>
-          <div class="prayer-time">${formatTime(t)}</div>
+          <div class="prayer-time">${formatTime(times[name])}</div>
         </div>
         <i class="fa-solid ${iconFor(name)} prayer-icon"></i>
       `;
@@ -206,36 +229,29 @@ const Prayer = (() => {
     });
   }
 
+  /* ---------- Day view: today's tracker (pointer-safe) ---------- */
   function renderTracker() {
     const container = document.getElementById("prayerTracker");
-    const log = getLog();
     const key = todayKey();
-    const done = log[key] || {};
+    const day = getLog()[key] || {};
 
     container.innerHTML = "";
     PRAYERS.forEach((name) => {
       const btn = document.createElement("button");
-      btn.className = `track-btn${done[name] ? " done" : ""}`;
-      btn.innerHTML = `<i class="fa-solid ${done[name] ? "fa-check" : iconFor(name)}"></i><small>${name}</small>`;
-      btn.addEventListener("click", () => {
-        const l = getLog();
-        if (!l[key]) l[key] = {};
-        l[key][name] = !l[key][name];
-        saveLog(l);
-        renderTracker();
-        updateProgress();
-        updateStats();
-        App.updateHomeStats();
-      });
+      btn.type = "button";
+      const isDone = !!day[name];
+      btn.className = `track-btn${isDone ? " done" : ""}`;
+      btn.innerHTML = `<i class="fa-solid ${isDone ? "fa-check" : iconFor(name)}"></i><small>${name}</small>`;
+      attachTap(btn, () => togglePrayer(key, name));
       container.appendChild(btn);
     });
   }
 
+  /* ---------- Ring ---------- */
   function updateProgress() {
-    const log = getLog();
     const key = todayKey();
-    const done = log[key] || {};
-    const count = PRAYERS.filter((p) => done[p]).length;
+    const day = getLog()[key] || {};
+    const count = PRAYERS.filter((p) => day[p]).length;
     const pct = Math.round((count / 5) * 100);
     const ring = document.getElementById("ringFill");
     const c = 2 * Math.PI * 52;
@@ -246,13 +262,126 @@ const Prayer = (() => {
   }
 
   function updateStats() {
-    const log = getLog();
-    const done = log[todayKey()] || {};
-    const count = PRAYERS.filter((p) => done[p]).length;
+    const day = getLog()[todayKey()] || {};
+    const count = PRAYERS.filter((p) => day[p]).length;
     document.getElementById("prayersDone").textContent = `${count}/5`;
   }
 
-  /* ---------- Yearly heatmap ---------- */
+  /* ---------- Month view ---------- */
+  function renderMonthGrid() {
+    const grid = document.getElementById("monthGrid");
+    const titleEl = document.getElementById("monthTitle");
+    const year = monthCursor.getFullYear();
+    const month = monthCursor.getMonth();
+
+    titleEl.textContent = `${MONTH_NAMES[month]} ${year}`;
+    grid.innerHTML = "";
+
+    const firstDay = new Date(year, month, 1);
+    const startDow = firstDay.getDay(); // 0 = Sun
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Leading blanks
+    for (let i = 0; i < startDow; i++) {
+      const blank = document.createElement("div");
+      blank.className = "month-cell empty";
+      grid.appendChild(blank);
+    }
+
+    const todayK = todayKey();
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateObj = new Date(year, month, d);
+      const key = keyFor(dateObj);
+      const count = countFor(key);
+      const isToday = key === todayK;
+      const isFuture = dateObj > now;
+      const isSelected = key === selectedDayKey;
+
+      const cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = `month-cell${count > 0 ? " level-" + count : ""}${
+        isToday ? " today" : ""
+      }${isFuture ? " future" : ""}${isSelected ? " selected" : ""}`;
+      cell.dataset.date = key;
+
+      // 5 dots
+      const day = getLog()[key] || {};
+      const dotsHtml = PRAYERS.map(
+        (p) => `<span class="dot${day[p] ? " done" : ""}"></span>`,
+      ).join("");
+
+      cell.innerHTML = `
+        <span class="month-day-num">${d}</span>
+        <span class="month-dots">${dotsHtml}</span>
+      `;
+
+      // Tap to select day & open detail panel
+      attachTap(cell, () => {
+        selectedDayKey = key;
+        renderMonthGrid();
+        renderDayDetail(key);
+        // Scroll detail into view
+        setTimeout(() => {
+          document
+            .getElementById("dayDetail")
+            .scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 60);
+      });
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function renderDayDetail(dateKey) {
+    const wrap = document.getElementById("dayDetail");
+    const titleEl = document.getElementById("dayDetailTitle");
+    const btnsEl = document.getElementById("dayDetailBtns");
+
+    // parse key: Y-M-D
+    const [y, m, d] = dateKey.split("-").map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const nice = dateObj.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    const isToday = dateKey === todayKey();
+    titleEl.textContent = isToday ? `Today — ${nice}` : nice;
+
+    btnsEl.innerHTML = "";
+    const day = getLog()[dateKey] || {};
+
+    PRAYERS.forEach((name) => {
+      const isDone = !!day[name];
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `day-detail-btn${isDone ? " done" : ""}`;
+      btn.innerHTML = `<i class="fa-solid ${isDone ? "fa-check" : iconFor(name)}"></i><span>${name}</span>`;
+      attachTap(btn, () => togglePrayer(dateKey, name));
+      btnsEl.appendChild(btn);
+    });
+
+    wrap.classList.remove("hidden");
+  }
+
+  function hideDayDetail() {
+    selectedDayKey = null;
+    document.getElementById("dayDetail").classList.add("hidden");
+    renderMonthGrid();
+  }
+
+  function jumpToToday() {
+    monthCursor = new Date();
+    selectedDayKey = todayKey();
+    renderMonthGrid();
+    renderDayDetail(selectedDayKey);
+  }
+
+  /* ---------- Year view (heatmap) ---------- */
   function renderYearly() {
     const log = getLog();
     const year = new Date().getFullYear();
@@ -266,9 +395,8 @@ const Prayer = (() => {
       activeDays = 0;
     const d = new Date(start);
     while (d <= end) {
-      const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-      const dayLog = log[key] || {};
-      const c = PRAYERS.filter((p) => dayLog[p]).length;
+      const key = keyFor(d);
+      const c = PRAYERS.filter((p) => (log[key] || {})[p]).length;
       if (c > 0) {
         counts[key] = c;
         totalPrayers += c;
@@ -281,7 +409,7 @@ const Prayer = (() => {
       cur = 0;
     const ds = new Date(start);
     while (ds <= end) {
-      const key = `${ds.getFullYear()}-${ds.getMonth() + 1}-${ds.getDate()}`;
+      const key = keyFor(ds);
       if (counts[key]) {
         cur++;
         bestStreak = Math.max(bestStreak, cur);
@@ -303,12 +431,12 @@ const Prayer = (() => {
     const gridStart = new Date(start);
     gridStart.setDate(gridStart.getDate() - firstDow);
     const totalCells = 53 * 7;
-    const todayK = todayKey(today);
+    const todayK = todayKey();
 
     for (let i = 0; i < totalCells; i++) {
       const cellDate = new Date(gridStart);
       cellDate.setDate(cellDate.getDate() + i);
-      const key = `${cellDate.getFullYear()}-${cellDate.getMonth() + 1}-${cellDate.getDate()}`;
+      const key = keyFor(cellDate);
       const cell = document.createElement("div");
       cell.className = "heat-cell";
 
@@ -331,7 +459,7 @@ const Prayer = (() => {
 
     const monthsEl = document.getElementById("heatmapMonths");
     monthsEl.innerHTML = "";
-    const monthNames = [
+    const monthShort = [
       "Jan",
       "Feb",
       "Mar",
@@ -354,7 +482,7 @@ const Prayer = (() => {
         const fom = new Date(year, m, 1);
         const diff = Math.floor((fom - ws) / 86400000);
         if (diff >= 0 && diff < 7) {
-          label.textContent = monthNames[m];
+          label.textContent = monthShort[m];
           break;
         }
       }
@@ -364,13 +492,13 @@ const Prayer = (() => {
 
   /* ---------- Location ---------- */
   function setLocationLabel() {
+    const el = document.getElementById("locationLabel");
     if (!coords) {
-      document.getElementById("locationLabel").innerHTML =
+      el.innerHTML =
         '<i class="fa-solid fa-location-dot"></i> Location not set';
       return;
     }
-    document.getElementById("locationLabel").innerHTML =
-      `<i class="fa-solid fa-location-dot"></i> ${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)}`;
+    el.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)}`;
   }
 
   function detectLocation() {
@@ -384,7 +512,7 @@ const Prayer = (() => {
         coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         localStorage.setItem(STORAGE_COORDS, JSON.stringify(coords));
         setLocationLabel();
-        refresh();
+        refreshDayView();
         App.toast("Location saved ✓");
       },
       () => {
@@ -395,12 +523,10 @@ const Prayer = (() => {
     );
   }
 
-  function openManualModal() {
+  const openManualModal = () =>
     document.getElementById("manualModal").classList.remove("hidden");
-  }
-  function closeManualModal() {
+  const closeManualModal = () =>
     document.getElementById("manualModal").classList.add("hidden");
-  }
 
   function saveManualLocation() {
     const lat = parseFloat(document.getElementById("latInput").value);
@@ -420,8 +546,43 @@ const Prayer = (() => {
     localStorage.setItem(STORAGE_COORDS, JSON.stringify(coords));
     setLocationLabel();
     closeManualModal();
-    refresh();
+    refreshDayView();
     App.toast("Location saved ✓");
+  }
+
+  /* ---------- Sub-tab switching ---------- */
+  function switchSubtab(name) {
+    currentSubtab = name;
+    document
+      .querySelectorAll(".subtab")
+      .forEach((b) => b.classList.toggle("active", b.dataset.psub === name));
+    document
+      .querySelectorAll(".psub-view")
+      .forEach((v) => v.classList.toggle("active", v.id === `psub-${name}`));
+
+    if (name === "day") refreshDayView();
+    if (name === "month") renderMonthGrid();
+    if (name === "year") renderYearly();
+  }
+
+  /* ---------- Universal tap helper (fixes mobile) ----------
+     Uses pointerdown so touch registers instantly.
+     Debounces rapid double-fires between pointerdown & click. */
+  function attachTap(el, handler) {
+    let lastFire = 0;
+    const fire = (e) => {
+      if (e && e.cancelable) e.preventDefault();
+      const now = Date.now();
+      if (now - lastFire < 300) return;
+      lastFire = now;
+      handler(e);
+    };
+    el.addEventListener("pointerdown", fire);
+    // Fallback for very old browsers without pointer events
+    if (!window.PointerEvent) {
+      el.addEventListener("touchstart", fire, { passive: false });
+      el.addEventListener("mousedown", fire);
+    }
   }
 
   /* ---------- Init ---------- */
@@ -445,18 +606,44 @@ const Prayer = (() => {
         if (e.target.id === "manualModal") closeManualModal();
       });
 
+      // Sub-tab switching
+      document.querySelectorAll(".subtab").forEach((btn) => {
+        btn.addEventListener("click", () => switchSubtab(btn.dataset.psub));
+      });
+
+      // Month navigation
+      document.getElementById("prevMonth").addEventListener("click", () => {
+        monthCursor.setMonth(monthCursor.getMonth() - 1);
+        selectedDayKey = null;
+        document.getElementById("dayDetail").classList.add("hidden");
+        renderMonthGrid();
+      });
+      document.getElementById("nextMonth").addEventListener("click", () => {
+        monthCursor.setMonth(monthCursor.getMonth() + 1);
+        selectedDayKey = null;
+        document.getElementById("dayDetail").classList.add("hidden");
+        renderMonthGrid();
+      });
+      document
+        .getElementById("jumpToday")
+        .addEventListener("click", jumpToToday);
+      document
+        .getElementById("closeDayDetail")
+        .addEventListener("click", hideDayDetail);
+
+      // Method / Asr selectors
       const methodSel = document.getElementById("methodSelect");
       methodSel.value = localStorage.getItem(STORAGE_METHOD) || "MWL";
       methodSel.addEventListener("change", () => {
         localStorage.setItem(STORAGE_METHOD, methodSel.value);
-        refresh();
+        refreshDayView();
       });
 
       const asrSel = document.getElementById("asrSelect");
       asrSel.value = localStorage.getItem(STORAGE_ASR) || "standard";
       asrSel.addEventListener("change", () => {
         localStorage.setItem(STORAGE_ASR, asrSel.value);
-        refresh();
+        refreshDayView();
       });
 
       const saved = localStorage.getItem(STORAGE_COORDS);
@@ -464,8 +651,14 @@ const Prayer = (() => {
     }
 
     setLocationLabel();
-    if (coords) refresh();
-    else renderYearly(); // still show heatmap even without location
+    if (coords) refreshDayView();
+    else {
+      renderTracker();
+      updateProgress();
+      updateStats();
+    }
+    renderYearly();
+    if (currentSubtab === "month") renderMonthGrid();
   }
 
   return { init };
