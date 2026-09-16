@@ -1,7 +1,7 @@
 {
   "name": "Reallanex — Islamic Companion",
   "short_name": "Reallanex",
-  "description": "Khalid's Islamic companion: prayer tracking, Quran, 99 Names of Allah, Tasbih & daily motivation.",
+  "description": "Khalid's fully offline Islamic companion: prayer, Quran, 99 Names, Tasbih.",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
@@ -27,12 +27,12 @@
   "shortcuts": [
     {
       "name": "Prayer Tracker",
-      "url": "./index.html#prayer",
+      "url": "./index.html",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Tasbih",
-      "url": "./index.html#tasbih",
+      "url": "./index.html",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
   ]

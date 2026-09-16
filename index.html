@@ -4,22 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0b3d2e" />
-  <meta name="description" content="Reallanex — Khalid's Islamic companion: prayer tracking, Quran, 99 Names of Allah, Tasbih & daily motivation." />
+  <meta name="description" content="Reallanex — Khalid's offline Islamic companion." />
   <meta name="author" content="Khalid (reallanex)" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <!-- Local Font Awesome (offline) -->
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css" />
+  <!-- Local Google Fonts (optional — download once and place in vendor/fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <title>Reallanex — Islamic Companion</title>
 </head>
 <body>
 
-  <!-- Animated background particles -->
   <canvas id="bg-canvas"></canvas>
 
-  <!-- Splash screen -->
+  <!-- Splash -->
   <div id="splash" class="splash">
     <div class="splash-inner">
       <div class="crescent"></div>
@@ -28,42 +29,66 @@
     </div>
   </div>
 
-  <!-- Top bar -->
+  <!-- Install banner -->
+  <div class="install-banner hidden" id="installBanner">
+    <i class="fa-solid fa-mobile-screen-button"></i>
+    <div class="install-text">
+      <strong>Install Reallanex</strong>
+      <span id="installSubtext">Works fully offline after install</span>
+    </div>
+    <button class="install-btn" id="installBtn">Install</button>
+    <button class="install-close" id="installClose"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <!-- Topbar -->
   <header class="topbar">
     <div class="brand">
-      <span class="brand-icon">☪</span>
+      <i class="fa-solid fa-mosque brand-icon"></i>
       <span class="brand-name">Reallanex</span>
     </div>
     <div class="hijri-date" id="hijriDate"></div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <i class="fa-solid fa-moon"></i>
+    </button>
   </header>
 
-  <!-- Navigation tabs -->
+  <!-- Tabs -->
   <nav class="tabbar" id="tabbar">
-    <button class="tab active" data-view="home">🏠<span>Home</span></button>
-    <button class="tab" data-view="prayer">🕌<span>Prayer</span></button>
-    <button class="tab" data-view="quran">📖<span>Quran</span></button>
-    <button class="tab" data-view="names">✨<span>Names</span></button>
-    <button class="tab" data-view="tasbih">📿<span>Tasbih</span></button>
+    <button class="tab active" data-view="home">
+      <i class="fa-solid fa-house"></i><span>Home</span>
+    </button>
+    <button class="tab" data-view="prayer">
+      <i class="fa-solid fa-kaaba"></i><span>Prayer</span>
+    </button>
+    <button class="tab" data-view="quran">
+      <i class="fa-solid fa-book-quran"></i><span>Quran</span>
+    </button>
+    <button class="tab" data-view="names">
+      <i class="fa-solid fa-star-and-crescent"></i><span>Names</span>
+    </button>
+    <button class="tab" data-view="tasbih">
+      <i class="fa-solid fa-circle-dot"></i><span>Tasbih</span>
+    </button>
   </nav>
 
-  <!-- MAIN CONTENT -->
   <main id="app">
 
-    <!-- HOME VIEW -->
+    <!-- HOME -->
     <section class="view active" id="view-home">
       <div class="hero">
         <div class="hero-glow"></div>
         <h2 class="hero-greeting" id="greeting">Assalamu Alaikum, Khalid</h2>
-        <p class="hero-sub">Welcome back, <strong>reallanex</strong> 🌙</p>
+        <p class="hero-sub">Welcome back, <strong>reallanex</strong></p>
       </div>
 
       <div class="card motivation-card">
-        <h3>💡 Daily Motivation</h3>
+        <h3><i class="fa-solid fa-lightbulb"></i> Daily Motivation</h3>
         <p class="arabic" id="motivationArabic"></p>
         <p class="translation" id="motivationText"></p>
         <p class="reference" id="motivationRef"></p>
-        <button class="btn-ghost" id="newMotivation">New Quote ↻</button>
+        <button class="btn-ghost" id="newMotivation">
+          <i class="fa-solid fa-rotate"></i> New Quote
+        </button>
       </div>
 
       <div class="stats-grid">
@@ -73,7 +98,7 @@
         </div>
         <div class="stat-card">
           <span class="stat-value" id="tasbihTotal">0</span>
-          <span class="stat-label">Tasbih Count</span>
+          <span class="stat-label">Tasbih Total</span>
         </div>
         <div class="stat-card">
           <span class="stat-value" id="streakDays">0</span>
@@ -82,13 +107,32 @@
       </div>
     </section>
 
-    <!-- PRAYER VIEW -->
+    <!-- PRAYER -->
     <section class="view" id="view-prayer">
-      <h2 class="section-title">🕌 Prayer Tracker</h2>
+      <h2 class="section-title"><i class="fa-solid fa-kaaba"></i> Prayer</h2>
+
+      <div class="settings-row">
+        <label for="methodSelect">Method</label>
+        <select id="methodSelect">
+          <option value="MWL">Muslim World League</option>
+          <option value="ISNA">ISNA (North America)</option>
+          <option value="Egypt">Egyptian General Authority</option>
+          <option value="Makkah">Umm al-Qura (Makkah)</option>
+          <option value="Karachi">University of Karachi</option>
+        </select>
+        <label for="asrSelect">Asr</label>
+        <select id="asrSelect">
+          <option value="standard">Standard (Shafi'i/Maliki/Hanbali)</option>
+          <option value="hanafi">Hanafi</option>
+        </select>
+      </div>
 
       <div class="location-bar">
-        <span id="locationLabel">Detecting location…</span>
-        <button class="btn-ghost" id="detectLocation">📍 Detect</button>
+        <span id="locationLabel"><i class="fa-solid fa-location-dot"></i> Location not set</span>
+        <div>
+          <button class="btn-ghost" id="detectLocation"><i class="fa-solid fa-crosshairs"></i> GPS</button>
+          <button class="btn-ghost" id="manualLocation"><i class="fa-solid fa-pen"></i> Manual</button>
+        </div>
       </div>
 
       <div class="prayer-list" id="prayerList"></div>
@@ -106,24 +150,11 @@
       </div>
 
       <h3 class="sub-title">Yearly Progress</h3>
-
-      <div class="year-stats" id="yearStats">
-        <div class="year-stat">
-          <span class="year-stat-value" id="yearTotalPrayers">0</span>
-          <span class="year-stat-label">Prayers This Year</span>
-        </div>
-        <div class="year-stat">
-          <span class="year-stat-value" id="yearDays">0</span>
-          <span class="year-stat-label">Active Days</span>
-        </div>
-        <div class="year-stat">
-          <span class="year-stat-value" id="yearBestStreak">0</span>
-          <span class="year-stat-label">Best Streak</span>
-        </div>
-        <div class="year-stat">
-          <span class="year-stat-value" id="yearPercent">0%</span>
-          <span class="year-stat-label">Completion</span>
-        </div>
+      <div class="year-stats">
+        <div class="year-stat"><span class="year-stat-value" id="yearTotalPrayers">0</span><span class="year-stat-label">Prayers</span></div>
+        <div class="year-stat"><span class="year-stat-value" id="yearDays">0</span><span class="year-stat-label">Active Days</span></div>
+        <div class="year-stat"><span class="year-stat-value" id="yearBestStreak">0</span><span class="year-stat-label">Best Streak</span></div>
+        <div class="year-stat"><span class="year-stat-value" id="yearPercent">0%</span><span class="year-stat-label">Completion</span></div>
       </div>
 
       <div class="heatmap-wrap">
@@ -142,45 +173,68 @@
       </div>
     </section>
 
-    <!-- QURAN VIEW -->
+    <!-- QURAN -->
     <section class="view" id="view-quran">
-      <h2 class="section-title">📖 Al-Quran Al-Kareem</h2>
+      <h2 class="section-title"><i class="fa-solid fa-book-quran"></i> Al-Quran</h2>
 
-      <div class="reciter-select">
-        <label for="reciter">Reciter:</label>
-        <select id="reciter">
-          <option value="Alafasy_128kbps">Mishary Rashid Alafasy</option>
-          <option value="Abdul_Basit_Murattal_192kbps">Abdul Basit (Murattal)</option>
-          <option value="Abdurrahmaan_As-Sudais_192kbps">Abdurrahman As-Sudais</option>
-          <option value="Maher_AlMuaiqly_128kbps">Maher Al-Muaiqly</option>
-          <option value="Saud_Al-Shuraim_128kbps">Saud Al-Shuraim</option>
-          <option value="Ghamadi_40kbps">Saad Al-Ghamdi</option>
-        </select>
+      <!-- Download prompt (only shows if Quran not cached) -->
+      <div class="download-card hidden" id="quranDownloadCard">
+        <i class="fa-solid fa-cloud-arrow-down download-icon"></i>
+        <h3>One-time download</h3>
+        <p>Download the full Quran once (~5 MB) to read it forever offline.</p>
+        <button class="btn-primary" id="downloadQuranBtn">
+          <i class="fa-solid fa-download"></i> Download Quran
+        </button>
+        <div class="progress-bar hidden" id="quranProgressWrap">
+          <div id="quranProgressBar"></div>
+        </div>
       </div>
 
-      <div class="surah-list" id="surahList"></div>
+      <!-- Reciter + list -->
+      <div id="quranMain" class="hidden">
+        <div class="reciter-select">
+          <label for="reciter"><i class="fa-solid fa-microphone"></i></label>
+          <select id="reciter">
+            <option value="Alafasy_128kbps">Mishary Rashid Alafasy</option>
+            <option value="Abdul_Basit_Murattal_192kbps">Abdul Basit (Murattal)</option>
+            <option value="Abdurrahmaan_As-Sudais_192kbps">Abdurrahman As-Sudais</option>
+            <option value="Maher_AlMuaiqly_128kbps">Maher Al-Muaiqly</option>
+            <option value="Saud_Al-Shuraim_128kbps">Saud Al-Shuraim</option>
+            <option value="Ghamadi_40kbps">Saad Al-Ghamdi</option>
+          </select>
+        </div>
 
-      <div class="quran-reader hidden" id="quranReader">
-        <button class="btn-ghost" id="backToSurahs">← Back to Surahs</button>
-        <h3 id="surahTitle"></h3>
-        <div id="ayahsContainer" class="ayahs-container"></div>
+        <div class="surah-list" id="surahList"></div>
+
+        <div class="quran-reader hidden" id="quranReader">
+          <button class="btn-ghost" id="backToSurahs">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <h3 id="surahTitle"></h3>
+          <div class="reader-controls">
+            <button class="btn-ghost" id="downloadSurahAudio">
+              <i class="fa-solid fa-download"></i> Download audio
+            </button>
+            <span class="audio-status" id="audioStatus"></span>
+          </div>
+          <div id="ayahsContainer" class="ayahs-container"></div>
+        </div>
       </div>
     </section>
 
-    <!-- NAMES VIEW -->
+    <!-- NAMES -->
     <section class="view" id="view-names">
-      <h2 class="section-title">✨ 99 Names of Allah</h2>
+      <h2 class="section-title"><i class="fa-solid fa-star-and-crescent"></i> 99 Names of Allah</h2>
       <p class="section-sub">Asma ul-Husna — The Most Beautiful Names</p>
       <div class="names-grid" id="namesGrid"></div>
     </section>
 
-    <!-- TASBIH VIEW -->
+    <!-- TASBIH -->
     <section class="view" id="view-tasbih">
-      <h2 class="section-title">📿 Tasbih</h2>
-      <p class="section-sub">Free counter for your dhikr &amp; personal duas — not tied to any prayer</p>
+      <h2 class="section-title"><i class="fa-solid fa-circle-dot"></i> Tasbih</h2>
+      <p class="section-sub">Free counter for dhikr and personal duas</p>
 
-      <!-- Religious presets -->
-      <h4 class="tasbih-group-title">🕌 Preset Dhikr</h4>
+      <h4 class="tasbih-group-title"><i class="fa-solid fa-mosque"></i> Preset Dhikr</h4>
       <div class="dhikr-selector" id="dhikrSelector">
         <button class="dhikr-btn active" data-dhikr="سُبْحَانَ اللَّهِ">سُبْحَانَ اللَّهِ<br><small>SubhanAllah</small></button>
         <button class="dhikr-btn" data-dhikr="الْحَمْدُ لِلَّهِ">الْحَمْدُ لِلَّهِ<br><small>Alhamdulillah</small></button>
@@ -189,15 +243,14 @@
         <button class="dhikr-btn" data-dhikr="أَسْتَغْفِرُ اللَّهَ">أَسْتَغْفِرُ اللَّهَ<br><small>Astaghfirullah</small></button>
         <button class="dhikr-btn" data-dhikr="لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ">لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ<br><small>La hawla wa la quwwata illa billah</small></button>
         <button class="dhikr-btn" data-dhikr="سُبْحَانَ اللَّهِ وَبِحَمْدِهِ">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ<br><small>SubhanAllahi wa bihamdih</small></button>
-        <button class="dhikr-btn" data-dhikr="اللَّهُمَّ صَلِّ عَلَى مُحَمَّد">اللَّهُمَّ صَلِّ عَلَى مُحَمَّد<br><small>Salawat on the Prophet ﷺ</small></button>
+        <button class="dhikr-btn" data-dhikr="اللَّهُمَّ صَلِّ عَلَى مُحَمَّد">اللَّهُمَّ صَلِّ عَلَى مُحَمَّد<br><small>Salawat</small></button>
       </div>
 
-      <!-- Personal duas -->
-      <h4 class="tasbih-group-title">🤲 My Personal Duas</h4>
+      <h4 class="tasbih-group-title"><i class="fa-solid fa-hands-praying"></i> My Personal Duas</h4>
       <div class="dhikr-selector" id="customDhikrSelector"></div>
       <div class="add-dua-bar">
-        <input type="text" id="newDuaInput" placeholder="Add your own dua or dhikr…" maxlength="80" />
-        <button class="btn-ghost" id="addDuaBtn">+ Add</button>
+        <input type="text" id="newDuaInput" placeholder="Add your own dua…" maxlength="80" />
+        <button class="btn-ghost" id="addDuaBtn"><i class="fa-solid fa-plus"></i> Add</button>
       </div>
 
       <div class="tasbih-counter-wrap">
@@ -209,26 +262,39 @@
       </div>
 
       <div class="tasbih-actions">
-        <button class="btn-ghost" id="tasbihReset">↺ Reset</button>
-        <button class="btn-ghost" id="tasbihTarget">Target: 33</button>
+        <button class="btn-ghost" id="tasbihReset"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        <button class="btn-ghost" id="tasbihTarget"><i class="fa-solid fa-bullseye"></i> Target: 33</button>
       </div>
       <p class="tasbih-current" id="currentDhikr">سُبْحَانَ اللَّهِ</p>
     </section>
 
   </main>
 
-  <!-- Audio player (fixed bottom) -->
+  <!-- Audio bar -->
   <div class="audio-bar hidden" id="audioBar">
-    <button id="audioPlayPause" class="audio-btn">▶</button>
+    <button id="audioPlayPause" class="audio-btn"><i class="fa-solid fa-play"></i></button>
     <div class="audio-info">
       <span id="audioTitle">—</span>
       <div class="audio-progress"><div id="audioProgress"></div></div>
     </div>
-    <button id="audioClose" class="audio-btn">✕</button>
+    <button id="audioClose" class="audio-btn"><i class="fa-solid fa-xmark"></i></button>
   </div>
 
-  <!-- Toast notification -->
+  <!-- Toast -->
   <div class="toast" id="toast"></div>
+
+  <!-- Manual location modal -->
+  <div class="modal-overlay hidden" id="manualModal">
+    <div class="modal">
+      <h3>Enter your location</h3>
+      <input type="number" id="latInput" placeholder="Latitude (e.g. 24.7136)" step="0.0001" />
+      <input type="number" id="lngInput" placeholder="Longitude (e.g. 46.6753)" step="0.0001" />
+      <div class="modal-actions">
+        <button class="btn-ghost" id="manualCancel">Cancel</button>
+        <button class="btn-primary" id="manualSave">Save</button>
+      </div>
+    </div>
+  </div>
 
   <script src="js/app.js"></script>
   <script src="js/prayer.js"></script>
